@@ -10,13 +10,13 @@
 170    N2$ = STR$(N2)
 180    L$=L$+N2$
 190  NEXT N2
-210  REM *PAUSE(.5)
-215  N%=2:GOSUB 10000
+215  N%=2:GOSUB 10000 print N lines
 220  PRINT SPACE$(35);"MASTERMIND"
-225  N%=2:GOSUB 10000
+225  N%=2:GOSUB 10000 print N lines
 240  PRINT SPACE$(17);"Written by Jeff Langr and Michael Glasser"
-250  N%=4:GOSUB 10000
-260  PRINT SPACE$(17)
+250  N%=4:GOSUB 10000 print N lines
+260  GOSUB 10100 clear msg line
+265  LOCATE 23,17
 270  INPUT "Do you need instructions [N]? ", I$
 290  IF I$<>"Y" AND I$<>"y" THEN 530
 
@@ -42,14 +42,12 @@
 480  PRINT "             Guess :       7 4 5 5 1"
 490  PRINT "               # black pegs = 2"
 500  PRINT "               # white pegs = 1"
-510  N%=1:GOSUB 10000
+510  N%=1:GOSUB 10000 print N lines
 511  INPUT "--- Hit return when ready...", X$
 512  CLS
-530  REM 
-540  REM *PAUSE(.5) 
-549  N%=10:GOSUB 10000 
-550  PRINT SPACE$(10);
 
+530  REM 
+555  LOCATE 23,17
 559  INPUT "Do you want to play SUPER MASTERMIND [N] ? ", Y1$
 580  IF Y1$<>"Y" AND Y1$<>"y" THEN GOTO 640
 590    P=5
@@ -81,23 +79,24 @@
 780    LOCATE 1,C8
 790    W=0
 800    B=0
-810    rem PRINT E2$
+810    REM
 820    LOCATE 19,23
 822    PRINT "                                          "
 823    LOCATE 19,23
 830    INPUT "", G$
 
 860    IF G$<>"GEEK" THEN 910
-861      PRINT A$
 870      PRINT SPACE$(23)+ MID$(A$, 1, 1)+"  "+MID$(A$, 2, 1)+"  "+MID$(A$, 3, 1)+"  "+MID$(A$, 4, 1)+"  "+MID$(A$, 5, 1)+"  --- cheater!"
-890      REM *PAUSE(.5)
 891      INPUT "", J$ 
+892      LOCATE 20,1
+893      PRINT SPACE$(80)
 900      GOTO 810 
 910    REM DOEND
 
-920    IF G$="QUIT" OR G$="EXIT" OR G$="//" OR G$="E" THEN 2100
+920    IF G$="QUIT" OR G$="quit" OR G$="q" THEN 2100
 
 960    IF LEN(G$)=P THEN 1000
+965      LOCATE 23,17
 970      P1$=STR$(P)
 980      PRINT SPACE$(23)+"Guess must be "+P1$+" characters long.";
 990      GOTO 810
@@ -108,6 +107,8 @@
 1024     M%=VAL(MID$(G$, M9, 1))
 1030     IF VAL(MID$(G$, M9, 1))>=1 AND VAL(MID$(G$, M9, 1)) <= VAL(N1$) THEN 1080
 1035       IF P=5 THEN M$="8." ELSE M$="6."
+1036       GOSUB 10100 clear msg line
+1037       LOCATE 23,17
 1040       PRINT SPACE$(23)+"Enter only the digits 1 through "+M$
 1070       GOTO 810
 1080     REM IF-END
@@ -159,7 +160,7 @@
 1490 NEXT N
 
 1500 IF B >= P THEN 1540
-1505   LOCATE 24, 19
+1505   LOCATE 21, 19
 1510   PRINT "You aren't very good at this"
 1520   GOSUB 1960
 1530   GOTO 1610
@@ -222,7 +223,6 @@
 
 2100 REM *** QUITTING
 2101 PRINT E4$+E1$
-2110 STOP
 9999 END
 
 10000 REM print N% lines
@@ -230,3 +230,8 @@
 10020     PRINT CHR$(13)
 10030 NEXT I
 10040 RETURN
+
+10100 REM clear message line
+10110 LOCATE 23,1
+10120 PRINT SPACE$(80)
+10130 RETURN
