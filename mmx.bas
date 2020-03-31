@@ -2,7 +2,7 @@
 11   R9=0
 12   C8=0
 20   DIM O1$[2],P1$[2]
-30   DIM L$[8],G$[20],A$[20],G1$[20],A1$[20]
+30   DIM L$[8],G$[20],A$[20],G1$[20],A1$[20],J$[1]
 40   DIM E1$[4]
 50   REM *** ESCAPE STRINGS ***
 60   REM *** E1$ = Home/clear screen
@@ -69,22 +69,19 @@
 660    R0=2
 670    M=10
 680    N1=6
-690  REM END
+690  REM IF-END
 
-
-700  REM *** print initial board
+700  REM *** go print initial board
 710  GOSUB 1670
 
-711  RANDOMIZE TIMER
+711  REM *** initialize random answer
+715  RANDOMIZE TIMER
 719  A$=SPACE$(P)
 720  FOR I%=1 TO P
 721    G=INT(N1 * RND + 1)
 730    MID$(A$,I%)=MID$(STR$(G), 2)
 731    REM A$[I]=L$[INT(RND(0)*N1)+1]
 740  NEXT I%
-741  PRINT "ANSWER:>"+A$+"<"
-742 END
-
 750  IF P=4 THEN A$[5]=" "
 
 760  FOR N=1 TO M
@@ -93,17 +90,17 @@
 781    REM PRINT E2$+FNC$(1,C8)+E5$   home + FNC(...) + memory lock
 790    W=0
 800    B=0
-810    PRINT E2$
-820    LOCATE 23,19
+810    rem PRINT E2$
+820    LOCATE 19,23
 821    REM PRINT FNC$(23,19)+'27"K";
-830    INPUT "", G$
-840    CLS
+830    INPUT ">", G$
+840    rem CLS
 
 860    IF G$<>"GEEK" THEN 910
 861      PRINT A$
 870      PRINT SPACE$(23)+ MID$(A$, 1, 1)+"  "+MID$(A$, 2, 1)+"  "+MID$(A$, 3, 1)+"  "+MID$(A$, 4, 1)+"  "+MID$(A$, 5, 1)+"  --- cheater!"
 890      REM *PAUSE(.5)
-891      INPUT "", $J 
+891      INPUT "", J$ 
 900      GOTO 810 
 910    REM DOEND
 
@@ -117,70 +114,82 @@
 
 1010   N1$=STR$(N1)
 1020   FOR M9=1 TO P
-1030     IF G$[M9;1]<"1" OR NUM(G$[M9;1]) > NUM(N1$) THEN DO
-1040       PRINT SPACE$(23);"Enter only the digits 1 through ";
-1050       IF P=5 THEN PRINT "8.";
-1060       ELSE PRINT "6.";
+1024     M%=VAL(MID$(G$, M9, 1))
+1030     IF VAL(MID$(G$, M9, 1))>=1 AND VAL(MID$(G$, M9, 1)) <= VAL(N1$) THEN 1080
+1035       IF P=5 THEN M$="8." ELSE M$="6."
+1040       PRINT SPACE$(23)+"Enter only the digits 1 through "+M$
 1070       GOTO 810
-1080     DOEND
+1080     REM IF-END
 1090   NEXT M9
 1100   C9=19
 1110   R9=N+3+R0
 1120   FOR X=1 TO 5
 1130     C9=C9+4
-1140     PRINT E4$+E2$+FNC$(C9,R9)+G$[X;1]
+1135     LOCATE R9,C9
+1136     PRINT MID$(G$, X, 1)
+1140     REM PRINT E4$+E2$+FNC$(C9,R9)+G$[X;1]
 1150   NEXT X
 1160   G1$=G$
 1170   A1$=A$
+
 1180   REM *** Count black pegs and mask out on guess & answer
 1190   FOR K=1 TO P
-1200     IF G1$[K;1]=A1$[K;1] THEN DO
-1210       B=B+1
-1220       G1$[K;1]="X"
-1230       A1$[K;1]="X"
+1200     IF MID$(G1$, K, 1) <> MID$(A1$, K, 1) THEN 1260
+1210       B =B + 1
+1220       MID$(G1$, K, 1)="X"
+1230       MID$(A1$, K, 1)="X"
 1240       O=N
 1250       IF (B=P) THEN GOTO 1550
-1260     DOEND
+1260     REM IF-END
 1270   NEXT K
+
 1280   REM *** Find the number of white pegs
 1290   FOR L=1 TO P
-1300     IF G1$[L;1] <> "X" THEN DO
+1300     IF MID$(G1$, L, 1) = "X" THEN 1380
 1310       FOR J=1 TO P
-1320         IF (G1$[L; 1]=A1$[J;1]) AND (G1$[L;1] <> "X") THEN DO
-1330           W=W+1
-1340           G1$[L; 1]="X"
-1350           A1$[J; 1]="X"
-1360         DOEND
+1320         IF (MID$(G1$, L, 1)<>MID$(A1$, J, 1)) OR (MID$(G1$, L, 1) = "X") THEN 1360
+1330           W = W + 1
+1340           MID$(G1$, L, 1) = "X"
+1350           MID$(A1$, J, 1) = "X"
+1360         REM DOEND
 1370       NEXT J
-1380     DOEND
+1380     REM DOEND
 1390   NEXT L
 1400   C9=C9+6
 1410   FOR X9=1 TO W
-1420     C9=C9+3
-1430     PRINT E4$+E2$+FNC$(C9,R9)+"W"
+1420     C9 = C9 + 3
+1428     LOCATE R9, C9
+1429     PRINT "W"
+1430     REM PRINT E4$+E2$+FNC$(C9,R9)+"W"
 1440   NEXT X9
 1450   FOR X9=1 TO B
-1460     C9=C9+3
-1470     PRINT E4$+E2+FNC$(C9,R9)+"B"
+1460     C9 = C9 + 3
+1468     LOCATE R9, C9
+1469     PRINT "B"
+1470     REM PRINT E4$+E2+FNC$(C9,R9)+"B"
 1480   NEXT X9
 1490 NEXT N
 
-1500 IF B < P THEN DO
-1510   PRINT FNC$(24,19);"You aren't very good at this"
+1500 IF B >= P THEN 1540
+1505   LOCATE 24, 19
+1510   PRINT "You aren't very good at this"
 1520   GOSUB 1960
 1530   GOTO 1610
-1540 DOEND
+1540 REM DOEND
 
 1550 REM *** Routine used after the answer has been found
 1560 O1$=STR$(O)
 1570 C9=C9+9
-1580 PRINT E4$+E2$+FNC$(C9,R9)+"CORRECT"
+1575 LOCATE R9, C9
+1578 PRINT "CORRECT"
+1580 REM PRINT E4$+E2$+FNC$(C9,R9)+"CORRECT"
 1590 GOSUB 1960
-1600 PRINT E2$+FNC$(22,21)+"You guessed it correctly in "+O1$+" tries."
-1610 PRINT E2$+FNC$(28,22)+"Care to play again [Y]? ";
-1620 LINPUT Y$
-1630 Y$=DEB$(UPS$(Y$))
-1640 IF Y$ <> "N" THEN 530
+1598 LOCATE 21,22
+1600 PRINT "You guessed it correctly in "+O1$+" tries."
+1605 LOCATE 22,28
+1610 PRINT "Care to play again [Y]? ";
+1620 INPUT Y$
+1640 IF Y$ <> "N" AND Y$ <> "n" THEN 530
 1650 GOTO 2100
 1660 END
 
@@ -194,15 +203,16 @@
 1790   IF Y >= 10 THEN 1830
 1800     Z=Y
 1860     Z$=STR$(Z)
-1820     PRINT SPACE$(15)+" "+Z$+")"
-1821     GOTO 1880
+1820     PRINT SPACE$(15)+MID$(STR$(Z),1)+")"
+1821     GOTO 1890
 1830   REM DOEND
-1840   ELSE DO
+1840   REM ELSE DO
 1850     Z = Y - 10
 1860     Z$=STR$(Z)
-1870     PRINT SPACE$(15)+"1"+Z$+")"
+1870     PRINT SPACE$(15)+"1"+MID$(Z$,2)+")"
 1880   REM DOEND
 1890 NEXT Y
+1891          END
 1900 PRINT
 1910 IF M=12 THEN PRINT SPACE$(14)+"ANSWER :                 "
 1920 ELSE         PRINT SPACE$(14)+"ANSWER :                  "
@@ -211,8 +221,8 @@
 1950 RETURN
 
 1960 REM *** Print answer line
-1970 PRINT FNC$(23,17);
-1980 PRINT A$[1;1]+"   "+A$[2;1]+"   ";A$[3;1]+"   "+A$[4;1]+"   "+A$[5;1]
+1970 LOCATE 17, 23
+1980 PRINT MID$(A$, 1, 1)+"  "+MID$(A$, 2, 1)+"  "+MID$(A$, 3, 1)+"  "+MID$(A$, 4, 1)+"  "+MID$(A$, 5, 1)
 2000 RETURN
 
 2010 DEF FNC$(X0,Y0)
